@@ -216,6 +216,8 @@ Polymer({
           this.fire('path-changed', {
             path: propertyKey, value: property.value
           });
+        } else {
+          property.valueUndefined = true;
         }
 
         newSection.attributes.push(property);
