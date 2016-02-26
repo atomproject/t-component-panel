@@ -17,8 +17,11 @@
 
       highlightjs-element {
         max-height: 100px;
-        overflow-y: hidden;
+        overflow: hidden;
         cursor: pointer;
+        border: 1px solid #bbbbbb;
+        margin-top: 10px;
+        border-radius: 2px;
       }
 
       paper-icon-button {
@@ -50,7 +53,7 @@
 
     <highlightjs-element lang="json" text="{{snippet}}" on-tap="openEditor"></highlightjs-element>
     <paper-toast id="toast"></paper-toast>
-    <paper-dialog id="object-editor-dialog" modal on-iron-overlay-opened="editorOpened">
+    <paper-dialog id="object-editor-dialog" on-iron-overlay-opened="editorOpened">
       <h2>{{title}} <paper-icon-button icon="editor:prettify" on-tap="prettify"></paper-icon-button></h2>
       <div id="ace-container"></div>
       <div class="buttons">
@@ -67,11 +70,12 @@
       properties: {
         value: {
           type: String,
-          observer: '_setStringValue'
+          observer: '_setStringValue',
+          notify: true
         },
         snippet: {
           type: String,
-          value: 'Object is empty. Click to add.',
+          value: 'Click to add the value.',
           computed: '_createSnippet(_value)'
         },
         _value: String,
@@ -113,6 +117,8 @@
       },
 
       _setStringValue: function() {
+        if (this.value === null) this.value = undefined;
+
         this._value = JSON.stringify(this.value, null, 2);
 
         if (!this.editor || this._value === this.editor.getValue()) {

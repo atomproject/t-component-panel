@@ -93,7 +93,7 @@
                 <label class="data-feeder">{{attribute.name}}</label>
                 <code-editor value="{{attribute.value}}"
                   title="{{attribute.name}}"
-                  data-key="{{attribute.key}}"
+                  data-key$="{{attribute.key}}"
                   on-value-changed="objectChanged">
                 </code-editor>
               </template>
@@ -338,10 +338,6 @@ Polymer({
   objectChanged: function(event) {
     var path = event.target.getAttribute('data-key');
     var value = event.target.value;
-
-    if (attribute = event.model.get('attribute')) {
-      attribute.value = value;
-    }
 
     this.fire('path-changed', {path: path, value: value});
   },
