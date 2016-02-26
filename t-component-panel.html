@@ -9,10 +9,11 @@
 <link rel="import" href="../t-radio-button/t-radio-button.html">
 <link rel="import" href="../t-icon-selector/t-icon-selector.html">
 <link rel="import" href="../t-data-feeder/t-data-feeder.html">
+<link rel="import" href="../t-checkbox/t-checkbox.html">
 <link rel="import" href="../t-shared-components/jquery.html">
+<link rel="import" href="code-editor/code-editor.html">
 
 <link rel="import" href="../iron-ajax/iron-ajax.html">
-<link rel="import" href="../t-checkbox/t-checkbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
@@ -87,6 +88,14 @@
                    on-data-changed="dataChanged"
                    data='{{_toDataFeederContract(attribute.value)}}'>
                 </t-data-feeder>
+              </template>
+              <template is="dom-if" if="{{_isType(attribute,'object')}}">
+                <label class="data-feeder">{{attribute.name}}</label>
+                <code-editor value="{{attribute.value}}"
+                  title="{{attribute.name}}"
+                  data-key="{{attribute.key}}"
+                  on-value-changed="objectChanged">
+                </code-editor>
               </template>
               <template is="dom-if" if="{{_isType(attribute,'api')}}">
                 <div class="layout horizontal">
@@ -320,6 +329,17 @@ Polymer({
     });
 
     if (attribute = change.model.get('attribute')) {
+      attribute.value = value;
+    }
+
+    this.fire('path-changed', {path: path, value: value});
+  },
+
+  objectChanged: function(event) {
+    var path = event.target.getAttribute('data-key');
+    var value = event.target.value;
+
+    if (attribute = event.model.get('attribute')) {
       attribute.value = value;
     }
 
