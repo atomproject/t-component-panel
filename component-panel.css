@@ -166,3 +166,7 @@ t-radio-button {
     --radio-button-checked-color: var(--grey-two);
     --radio-button-unchecked-color: var(--primary-text-color);
 }
+
+sheet-editor {
+  margin-top: 10px;
+}

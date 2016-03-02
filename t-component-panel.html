@@ -12,6 +12,7 @@
 <link rel="import" href="../t-checkbox/t-checkbox.html">
 <link rel="import" href="../t-shared-components/jquery.html">
 <link rel="import" href="code-editor/code-editor.html">
+<link rel="import" href="sheet-editor/sheet-editor.html">
 
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../paper-item/paper-item.html">
@@ -96,6 +97,14 @@
                   data-key$="{{attribute.key}}"
                   on-value-changed="objectChanged">
                 </code-editor>
+              </template>
+              <template is="dom-if" if="{{_isType(attribute,'array')}}">
+                <label class="data-feeder">{{attribute.name}}</label>
+                <sheet-editor value="{{attribute.value}}"
+                  title="{{attribute.name}}"
+                  data-key$="{{attribute.key}}"
+                  on-value-changed="arrayChanged">
+                </sheet-editor>
               </template>
               <template is="dom-if" if="{{_isType(attribute,'api')}}">
                 <div class="layout horizontal">
@@ -336,6 +345,13 @@ Polymer({
   },
 
   objectChanged: function(event) {
+    var path = event.target.getAttribute('data-key');
+    var value = event.target.value;
+
+    this.fire('path-changed', {path: path, value: value});
+  },
+
+  arrayChanged: function(event) {
     var path = event.target.getAttribute('data-key');
     var value = event.target.value;
 
