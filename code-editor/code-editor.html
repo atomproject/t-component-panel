@@ -34,6 +34,7 @@
       }
 
       #object-editor-dialog {
+        z-index: 106 !important;
         position: fixed;
         top: 0;
         bottom: 0;
@@ -91,6 +92,7 @@
         this.editor.setTheme('ace/theme/github');
         this.editor.getSession().setTabSize(2);
         this.editor.getSession().setUseSoftTabs(true);
+        this.editor.setPrintMarginColumn(false);
 
         if (this._value !== undefined) {
           this.editor.setValue(this._value);
