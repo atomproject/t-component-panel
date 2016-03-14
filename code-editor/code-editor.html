@@ -1,15 +1,6 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../iron-icons/iron-icons.html">
 <link rel="import" href="../../highlightjs-element/highlightjs-element.html">
-<link rel="import" href="../../paper-toast/paper-toast.html">
-<link rel="import" href="../../paper-dialog/paper-dialog.html">
-<link rel="import" href="../../paper-button/paper-button.html">
-
-<link rel="import" href="indentation-icon.html">
-
-<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
-<script src="ace/mode-json.js" type="text/javascript" charset="utf-8"></script>
-<script src="theme-github.js" type="text/javascript" charset="utf-8"></script>
+<link rel="import" href="../ace-element/ace-element.html">
 
 <dom-module id="code-editor">
   <template>
@@ -26,45 +17,10 @@
         margin-top: 10px;
         border-radius: 2px;
       }
-
-      paper-icon-button {
-        background-color: #F0F0F0;
-        border-radius: 50% 50%;
-        margin-left: 15px;
-      }
-
-      #object-editor-dialog {
-        z-index: 106 !important;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: 0;
-      }
-
-      #object-editor-dialog #ace-container {
-        font-size: 14px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        box-sizing: border-box;
-        height: calc(100% - 132px);
-        width: calc(100% - 40px);
-        margin: 20px;
-        margin-bottom: 0;
-      }
     </style>
 
     <highlightjs-element lang="json" text="{{snippet}}" on-tap="openEditor"></highlightjs-element>
-    <paper-toast id="toast"></paper-toast>
-    <paper-dialog id="object-editor-dialog" on-iron-overlay-opened="editorOpened">
-      <h2>{{title}} <paper-icon-button icon="editor:prettify" on-tap="prettify"></paper-icon-button></h2>
-      <div id="ace-container"></div>
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm on-tap="validateJson">Save</paper-button>
-      </div>
-    </paper-dialog>
+    <ace-element id="ace" value="{{value}}" str-val="{{strVal}}" title="{{title}}"></ace-element>
   </template>
 
   <script>
@@ -72,87 +28,22 @@
       is: 'code-editor',
 
       properties: {
-        value: {
-          type: String,
-          observer: '_setStringValue',
-          notify: true
-        },
         snippet: {
           type: String,
           value: 'Click to add the value.',
-          computed: '_createSnippet(_value)'
+          computed: '_createSnippet(strVal)'
         },
-        _value: String,
+        value: Object,
+        strVal: String,
         title: String
       },
 
-      attached: function() {
-        this.editor = ace.edit(this.$['ace-container']);
-        this.editor.getSession().setMode('ace/mode/json');
-        this.editor.setTheme('ace/theme/github');
-        this.editor.getSession().setTabSize(2);
-        this.editor.getSession().setUseSoftTabs(true);
-        this.editor.setPrintMarginColumn(false);
-
-        if (this._value !== undefined) {
-          this.editor.setValue(this._value);
-          this.editor.renderer.updateText();
-        }
-      },
-
-      editorOpened: function(event) {
-        if (this._value !== this.editor.getValue()) {
-          this.editor.setValue(this._value || '');
-        }
-
-        this.editor.selection.clearSelection();
-      },
-
-      validateJson: function(event) {
-        var _value = this.editor.getValue();
-
-        try {
-          this.value = JSON.parse(_value);
-        } catch (e) {
-          this.$.toast.text = e.toString();
-          this.$.toast.open();
-          event.stopPropagation();
-          event.preventDefault();
-        }
-      },
-
-      _setStringValue: function() {
-        if (this.value === null) this.value = undefined;
-
-        this._value = JSON.stringify(this.value, null, 2);
-
-        if (!this.editor || this._value === this.editor.getValue()) {
-          return;
-        }
-
-        this.editor.setValue(this._value);
-      },
-
-      _createSnippet: function(_value) {
-        return _value;
-      },
-
       openEditor: function() {
-        this.$['object-editor-dialog'].open();
+        this.$.ace.openEditor();
       },
 
-      prettify: function() {
-        var _value = this.editor.getValue();
-
-        try {
-          _value = JSON.stringify(JSON.parse(_value), null, 2);
-          this._value = _value;
-          this.editor.setValue(_value);
-          this.editor.selection.clearSelection();
-        } catch (e) {
-          this.$.toast.text = e.toString();
-          this.$.toast.open();
-        }
+      _createSnippet: function(strVal) {
+        return strVal;
       }
     });
   </script>

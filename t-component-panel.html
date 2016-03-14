@@ -13,6 +13,7 @@
 <link rel="import" href="../t-shared-components/jquery.html">
 <link rel="import" href="code-editor/code-editor.html">
 <link rel="import" href="sheet-editor/sheet-editor.html">
+<link rel="import" href="response-editor/response-editor.html">
 
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../paper-item/paper-item.html">
@@ -105,6 +106,12 @@
                   data-key$="{{attribute.key}}"
                   on-value-changed="arrayChanged">
                 </sheet-editor>
+              </template>
+              <template is="dom-if" if="{{_isType(attribute,'url')}}">
+                <response-editor url="{{attribute.value}}"
+                  title="{{attribute.name}}"
+                  data-key$="{{attribute.key}}"
+                  on-url-changed="_urlChanged"></response-editor>
               </template>
               <template is="dom-if" if="{{_isType(attribute,'api')}}">
                 <div class="layout horizontal">
@@ -270,6 +277,13 @@ Polymer({
   _textChanged: function(e) {
     var key = e.model._nodes[0].getAttribute('data-key');
     var value = e.target.value;
+
+    this.fire('path-changed', {path: key, value: value});
+  },
+
+  _urlChanged: function(e) {
+    var key = e.model._nodes[0].getAttribute('data-key');
+    var value = e.target.url;
 
     this.fire('path-changed', {path: key, value: value});
   },

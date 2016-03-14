@@ -26,14 +26,14 @@
 <body unresolved>
   <t-component-panel property-source="property.json"></t-component-panel>
 
-	<script>
-	window.addEventListener('WebComponentsReady', function (e) {
+  <script>
+  window.addEventListener('WebComponentsReady', function (e) {
     var panel = document.querySelector('t-component-panel');
 
     panel.addEventListener('path-changed', function(e) {
       console.log({path: e.detail.path, value: e.detail.value});
     });
-	});
-	</script>
+  });
+  </script>
 </body>
 </html>

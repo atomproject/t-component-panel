@@ -57,6 +57,11 @@
       "array": {
         "name": "Array Object",
         "type": "array"
+      },
+      "url": {
+        "name": "Github Packages URL",
+        "type": "url",
+        "value": "https://api.github.com/search/repositories?q=troxel-core"
       }
     }
   }]
