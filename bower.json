@@ -40,7 +40,8 @@
     "highlightjs-element": "atomproject/highlightjs-element#^1.0.0",
     "paper-toast": "polymerelements/paper-toast#^1.2.0",
     "iron-icon": "polymerelements/iron-icon#^1.0.7",
-    "handsontable": "^0.23.0"
+    "handsontable": "^0.23.0",
+    "firebase": "^2.4.1"
   },
   "devDependencies": {
     "webcomponentsjs": "^0.7.14",
