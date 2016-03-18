@@ -5,10 +5,7 @@
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="indentation-icon.html">
-
-<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
-<script src="ace/mode-json.js" type="text/javascript" charset="utf-8"></script>
-<script src="theme-github.js" type="text/javascript" charset="utf-8"></script>
+<link rel="import" href="ace-lib.html">
 
 <dom-module id="ace-element">
   <template>
@@ -23,7 +20,7 @@
         margin-left: 15px;
       }
 
-      #object-editor-dialog {
+      #editor-dialog {
         z-index: 106 !important;
         position: fixed;
         top: 0;
@@ -33,12 +30,12 @@
         margin: 0;
       }
 
-      #object-editor-dialog #ace-container {
+      #editor-dialog #ace-container {
         font-size: 14px;
         border: 1px solid #ddd;
         border-radius: 3px;
         box-sizing: border-box;
-        height: calc(100% - 132px);
+        height: calc(100% - 136px);
         width: calc(100% - 40px);
         margin: 20px;
         margin-bottom: 0;
@@ -46,7 +43,7 @@
     </style>
 
     <paper-toast id="toast"></paper-toast>
-    <paper-dialog id="object-editor-dialog" modal on-iron-overlay-opened="editorOpened">
+    <paper-dialog id="editor-dialog" modal on-iron-overlay-opened="editorOpened">
       <h2>{{title}} <paper-icon-button icon="indent:prettify" on-tap="prettify"></paper-icon-button></h2>
       <div id="ace-container"></div>
       <div class="buttons">
@@ -80,7 +77,7 @@
         this.editor.setTheme('ace/theme/github');
         this.editor.getSession().setTabSize(2);
         this.editor.getSession().setUseSoftTabs(true);
-        this.editor.setPrintMarginColumn(false);
+        this.editor.setShowPrintMargin(false);
 
         if (this.strVal !== undefined) {
           this.editor.setValue(this.strVal );
@@ -155,11 +152,11 @@
       },
 
       openEditor: function() {
-        this.$['object-editor-dialog'].open();
+        this.$['editor-dialog'].open();
       },
 
       closeEditor: function() {
-        this.$['object-editor-dialog'].close();
+        this.$['editor-dialog'].close();
       }
     });
   </script>

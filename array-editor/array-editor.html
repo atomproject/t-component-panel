@@ -1,0 +1,66 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-pages/iron-pages.html">
+<link rel="import" href="../../t-radio-group/t-radio-group.html">
+
+<link rel="import" href="../sheet-editor/sheet-editor.html">
+<link rel="import" href="../response-transformer/response-transformer.html">
+
+<dom-module id="array-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: var(--primary-font-family, 'Open Sans');
+      }
+    </style>
+
+    <t-radio-group label="{{label}}" pill-button on-selected-item-changed="changePage"
+      data="{{pages}}"></t-radio-group>
+    <iron-pages id="pageSelector" selected="0">
+      <sheet-editor title="{{label}}" value="{{value}}"></sheet-editor>
+      <response-transformer title="{{label}}" data-source="{{dataSource}}"
+        url="{{url}}" transform="{{transform}}" translator="{{translator}}">
+        </response-transformer>
+    </iron-pages>
+  </template>
+  <script>
+    Polymer({
+      is: 'array-editor',
+
+      properties: {
+        label: String,
+        url: String,
+        transform: Function,
+        translator: Function,
+        value: {
+          type: Array,
+          notify: true
+        },
+        dataSource: {
+          type: Object,
+          notify: true
+        },
+        pages: {
+          type: Array,
+          value: function() {
+            return ["Static Data", "Dynamic Data"];
+          }
+        }
+      },
+
+      changePage: function(event) {
+        var newPage;
+
+        if (!this.pages) {
+          return;
+        }
+
+        newPage = this.pages.indexOf(event.detail.value);
+
+        if (newPage !== -1) {
+          this.$.pageSelector.selected = newPage;
+        }
+      }
+    });
+  </script>
+</dom-module>

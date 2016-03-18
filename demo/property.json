@@ -56,7 +56,10 @@
       },
       "array": {
         "name": "Array Object",
-        "type": "array"
+        "type": "array",
+        "url": "http://www.json-generator.com/api/json/get/bQODrtAkHS?indent=2",
+        "transform": "function transform(inp) {return inp.map(function(obj) {return {name: obj.name, gender: obj.gender, age: obj.age }; }); }",
+        "translator": "function translator(inp) {var columns = Object.keys(inp[0]); var out = inp.map(function(obj) {return columns.map(function(colName) {return obj[colName]; }); }); out.unshift(columns); return out; }"
       },
       "url": {
         "name": "Github Packages URL",

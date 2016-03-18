@@ -12,7 +12,7 @@
 <link rel="import" href="../t-checkbox/t-checkbox.html">
 <link rel="import" href="../t-shared-components/jquery.html">
 <link rel="import" href="code-editor/code-editor.html">
-<link rel="import" href="sheet-editor/sheet-editor.html">
+<link rel="import" href="array-editor/array-editor.html">
 <link rel="import" href="response-editor/response-editor.html">
 
 <link rel="import" href="../iron-ajax/iron-ajax.html">
@@ -100,12 +100,15 @@
                 </code-editor>
               </template>
               <template is="dom-if" if="{{_isType(attribute,'array')}}">
-                <label class="data-feeder">{{attribute.name}}</label>
-                <sheet-editor value="{{attribute.value}}"
-                  title="{{attribute.name}}"
+                <array-editor value="{{attribute.value}}"
+                  label="{{attribute.name}}"
+                  url="{{attribute.url}}"
+                  transform="{{attribute.transform}}"
+                  translator="{{attribute.translator}}"
                   data-key$="{{attribute.key}}"
-                  on-value-changed="arrayChanged">
-                </sheet-editor>
+                  on-value-changed="arrayChanged"
+                  on-data-source-changed="dataSourceChanged">
+                </array-editor>
               </template>
               <template is="dom-if" if="{{_isType(attribute,'url')}}">
                 <response-editor url="{{attribute.value}}"
@@ -242,6 +245,9 @@ Polymer({
             path: propertyKey, value: property.value
           });
         } else {
+          //since value is bound to controls which might set
+          //some initial value we have to retain whether the
+          //value provided from property.json was undefined or not
           property.valueUndefined = true;
         }
 
@@ -370,6 +376,21 @@ Polymer({
     var value = event.target.value;
 
     this.fire('path-changed', {path: path, value: value});
+  },
+
+  dataSourceChanged: function(event) {
+    var path = event.target.getAttribute('data-key');
+    var dataSource = event.target.dataSource;
+    var attribute;
+
+    // TODO: why `setTimeout` is needed here?. It not needed in `dataChanged`.
+    setTimeout(function() {
+      if (attribute = event.model.get('attribute')) {
+        attribute.dataSource = dataSource;
+      }
+    });
+
+    this.fire('update-data-source', {path: path, dataSource: dataSource});
   },
 
   _getMetadata: function() {
