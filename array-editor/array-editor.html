@@ -20,7 +20,7 @@
       <sheet-editor title="{{label}}" value="{{value}}"></sheet-editor>
       <response-transformer title="{{label}}" data-source="{{dataSource}}"
         url="{{url}}" transform="{{transform}}" translator="{{translator}}">
-        </response-transformer>
+      </response-transformer>
     </iron-pages>
   </template>
   <script>
@@ -32,14 +32,17 @@
         url: String,
         transform: Function,
         translator: Function,
+
         value: {
           type: Array,
           notify: true
         },
+
         dataSource: {
           type: Object,
           notify: true
         },
+
         pages: {
           type: Array,
           value: function() {
