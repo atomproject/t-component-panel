@@ -17,8 +17,8 @@
     <t-radio-group label="{{label}}" pill-button on-selected-item-changed="changePage"
       data="{{pages}}"></t-radio-group>
     <iron-pages id="pageSelector" selected="0">
-      <sheet-editor title="{{label}}" value="{{value}}"></sheet-editor>
-      <response-transformer title="{{label}}" data-source="{{dataSource}}"
+      <sheet-editor id="sd" title="{{label}}" value="{{value}}"></sheet-editor>
+      <response-transformer id="dd" title="{{label}}" data-source="{{dataSource}}"
         url="{{url}}" transform="{{transform}}" translator="{{translator}}">
       </response-transformer>
     </iron-pages>
@@ -61,6 +61,13 @@
         newPage = this.pages.indexOf(event.detail.value);
 
         if (newPage !== -1) {
+          if (newPage === 0) {
+            this.$.sd.saveValue();
+          }
+          else if (newPage === 1) {
+            this.$.dd.saveDataSource();
+          }
+
           this.$.pageSelector.selected = newPage;
         }
       }

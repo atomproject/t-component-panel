@@ -6,6 +6,8 @@
 <link rel="import" href="../../iron-icons/iron-icons.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
 <link rel="import" href="../../t-input/t-input.html">
+<link rel="import" href="../../code-generator-behavior/js-beautify.html">
+<link rel="import" href="../../highlightjs-element/highlightjs-element.html">
 
 <link rel="import" href="../ace-element/ace-lib.html">
 <link rel="import" href="../ace-element/indentation-icon.html">
@@ -76,10 +78,20 @@
         top: 2px;
         z-index: 110;
       }
+
+      highlightjs-element {
+        max-height: 100px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 1px solid #bbbbbb;
+        margin-top: 10px;
+        border-radius: 2px;
+        --allow-overflow-x: hidden;
+      }
     </style>
 
-    <paper-button raised on-tap="openEditor">Open</paper-button>
-    <iron-ajax id="fetch" url="{{url}}" handle-as="json" on-response="handleResponse"></iron-ajax>
+    <highlightjs-element lang="json" text="{{snippet}}" on-tap="openEditor"></highlightjs-element>
+    <iron-ajax id="fetch" url="{{url}}" handle-as="json" on-response="handleResponse" on-error="handleError"></iron-ajax>
     <paper-toast id="toast"></paper-toast>
 
     <paper-dialog id="editor-dialog" modal>
@@ -101,8 +113,8 @@
         </div>
       </div>
       <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm on-tap="saveDataSource">Save</paper-button>
+        <paper-button dialog-dismiss on-tap="cancelChanges">Cancel</paper-button>
+        <paper-button dialog-confirm on-tap="saveDataSource" disabled="{{disableSave}}">Save</paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -112,19 +124,47 @@
 
       properties: {
         title: String,
-        url: String,
+
+        url: {
+          type: String,
+          observer: 'urlChanged'
+        },
+
         transform: {
           type: Function,
           observer: 'initTransform'
         },
+
         translator:{
           type: Function,
           observer: 'initTranslator'
         },
+
         dataSource: {
           type: Object,
           notify: true
+        },
+
+        outputData: {
+          type: String,
+          observer: 'outputDataChanged'
+        },
+
+        disableSave: {
+          type: Boolean,
+          value: true,
+          computed: 'shouldDisableSave(outputData)'
+        },
+
+        snippet: {
+          value: 'Click to add url and transform',
+          type: String,
+          computed: '_createSnippet(url, transform)'
         }
+      },
+
+      beautifyOpts: {
+        indent_size: 2
       },
 
       attached: function() {
@@ -163,6 +203,8 @@
 
         this.inputEditor.setReadOnly(true);
         this.outputEditor.setReadOnly(true);
+
+        this.transformEditor.on('change', this.transformChanged.bind(this));
       },
 
       _isString: function(val) {
@@ -187,6 +229,19 @@
 
       openEditor: function() {
         this.$['editor-dialog'].open();
+
+        if (this.transformEditor) {
+          this.transformEditor.renderer.updateText();
+        }
+
+        if (!this._prevDataSource) {
+          this._prevDataSource = {
+            url: this.url,
+            transform: this.transform
+          };
+        }
+
+        this.generateRequest(true);
       },
 
       closeEditor: function() {
@@ -195,12 +250,26 @@
 
       setValue: function(editor, val) {
         val = val ? val.toString() : '';
+
+        if (editor === this.transformEditor) {
+          val = window.js_beautify(val, this.beautifyOpts);
+        }
+
         editor.setValue(val);
         editor.selection.clearSelection();
         editor.scrollToLine(0);
       },
 
-      generateRequest: function() {
+      generateRequest: function(_fullTransform) {
+        var type = Object.prototype.toString.call(_fullTransform);
+
+        if (_fullTransform && type === '[object Boolean]') {
+          this._fullTransform = true;
+        } else {
+          this._fullTransform = false;
+        }
+
+        this.outputData = '';
         this.$.fetch.generateRequest();
       },
 
@@ -218,6 +287,15 @@
         strResp = JSON.stringify(resp, null, 2);
         this.setValue(this.inputEditor, strResp);
         this.inputData = resp;
+
+        if (this._fullTransform) {
+          this.transformInput();
+        }
+      },
+
+      handleError: function() {
+        this.$.toast.text = 'URL Error: Bad url, couldn\'t load from the given url';
+        this.$.toast.open();
       },
 
       transformInput: function() {
@@ -226,20 +304,29 @@
         var idFunc = function (inp) { return inp; };
 
         if (!this.inputData) {
-          //TODO: tell user that he has to have api response first
+          this.$.toast.text = 'No input data. Click on the get response button first';
+          this.$.toast.open();
+
           return;
         }
 
-        this.transform = this.transformEditor.getValue();
-        translator = this.translator || idFunc;
+        try {
+          this.transform = this.transformEditor.getValue();
+          translator = this.translator || idFunc;
+          outputData = this.transform(inputData);
+        } catch (err) {
+          this.$.toast.text = err.toString();
+          this.$.toast.open();
+
+          throw err;
+        }
 
         try {
-          outputData = this.transform(inputData);
           strOutputData = JSON.stringify(outputData, null, 2);
           translator(outputData);
-          this.setValue(this.outputEditor, strOutputData);
+          this.outputData = strOutputData;
         } catch (err) {
-          this.$.toast.text = 'Invalid transform output';
+          this.$.toast.text = 'Transform output format error: Expected array of objects';
           this.$.toast.open();
 
           throw err;
@@ -264,14 +351,59 @@
         };
       },
 
-      saveDataSource: function(event) {
-        try {
-          this.transformInput();
-          this.dataSource = this.getDataSource();
-        } catch (err) {
-          event.stopPropagation();
-          event.preventDefault();
+      saveDataSource: function() {
+        this.dataSource = this.getDataSource();
+        this._prevDataSource = {
+          url: this.url,
+          transform: this.transform
+        };
+      },
+
+      prettify: function() {
+        var val = this.transformEditor.getValue();
+
+        this.setValue(this.transformEditor, val);
+      },
+
+      _createSnippet: function(url, transform) {
+        var snippet = {
+          url: url,
+          transform: transform.toString()
+        };
+
+        return JSON.stringify(snippet, null, 2);
+      },
+
+      outputDataChanged: function(outputData) {
+        this.setValue(this.outputEditor, outputData);
+      },
+
+      shouldDisableSave: function(outputData) {
+        return !Boolean(outputData);
+      },
+
+      cancelChanges: function() {
+        if (!this._prevDataSource) {
+          return;
         }
+
+        this.url = this._prevDataSource.url;
+        this.transform = this._prevDataSource.transform;
+        this.setValue(this.transformEditor, this.transform);
+      },
+
+      urlChanged: function() {
+        if (!this.inputEditor || !this.outputEditor) {
+          return;
+        }
+
+        this.inputData = undefined;
+        this.setValue(this.inputEditor, '');
+        this.setValue(this.outputEditor, '');
+      },
+
+      transformChanged: function() {
+        this.outputData = '';
       }
     });
   </script>

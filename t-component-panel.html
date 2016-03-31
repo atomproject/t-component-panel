@@ -375,6 +375,10 @@ Polymer({
     var path = event.target.getAttribute('data-key');
     var value = event.target.value;
 
+    if (attribute = event.model.get('attribute')) {
+      attribute.useDs = false;
+    }
+
     this.fire('path-changed', {path: path, value: value});
   },
 
@@ -387,6 +391,7 @@ Polymer({
     setTimeout(function() {
       if (attribute = event.model.get('attribute')) {
         attribute.dataSource = dataSource;
+        attribute.useDs = true;
       }
     });
 

@@ -42,7 +42,8 @@
     "iron-icon": "polymerelements/iron-icon#^1.0.7",
     "handsontable": "^0.23.0",
     "firebase": "^2.4.1",
-    "iron-pages": "polymerelements/iron-pages#^1.0.7"
+    "iron-pages": "polymerelements/iron-pages#^1.0.7",
+    "code-generator-behavior": "atomproject/code-generator-behavior#^1.0.0"
   },
   "devDependencies": {
     "webcomponentsjs": "^0.7.14",
