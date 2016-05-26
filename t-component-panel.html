@@ -203,7 +203,7 @@ Polymer({
   },
 
   _toDataFeederContract: function(value) {
-    return value.map(function(item) {
+    return (value || []).map(function(item) {
       return {value: item};
     });
   },
