@@ -13,8 +13,10 @@
     --paper-input-container-color: #eee;
     --paper-input-container-focus-color: var(--primary-text-color);
 
+    --dropdown-item-border-color: var(--form-underline-color);
+    --dropdown-border-color: var(--form-underline-color);
     --checkbox-check-sign-color: var(--primary-text-color);
-    --checkbox-checked-color: var(--gray-two);
+    --checkbox-checked-color: var(--grey-two);
     --pill-border-color: var(--grey-two);
     --pill-radio-text-unselected-color: var(--primary-text-color);
     --form-label-color: var(--primary-text-color);
