@@ -19,7 +19,7 @@
     --checkbox-checked-color: var(--grey-two);
     --pill-border-color: var(--grey-two);
     --pill-radio-text-unselected-color: var(--primary-text-color);
-    --form-label-color: var(--primary-text-color);
+    --form-label-color: var(--light-primary-color);
     --radio-button-checked-color: var(--grey-two);
     --radio-button-unchecked-color: var(--primary-text-color);
 }
