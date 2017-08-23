@@ -179,12 +179,22 @@ Polymer({
       observer: 'propertySourceChanged'
     },
 
+    propertyData: {
+      type : Object,
+      observer: 'propertyDataChanged'
+    },
+
     jsonResponse: {
       type: Object,
       value: function() {
         return null;
       }
     }
+  },
+
+  propertyDataChanged : function(propertyData){
+    if(propertyData != null && propertyData != undefined)
+      this.__ingestPropertyData(propertyData);
   },
 
   propertySourceChanged: function(propertySource) {
@@ -281,11 +291,15 @@ Polymer({
     this.isDataComponent = false;
 
     if (response !== null) {
-      this.panelName = response.name;
-      this.sections = this.getSections(response.properties);
+      this.__ingestPropertyData(response);
     } else {
       this.$.controller.textContent = errorMessage;
     }
+  },
+
+  __ingestPropertyData : function(propertyData){
+      this.panelName = propertyData.name;
+      this.sections = this.getSections(propertyData.properties);
   },
 
   _handleApiResponse: function(e, response) {
